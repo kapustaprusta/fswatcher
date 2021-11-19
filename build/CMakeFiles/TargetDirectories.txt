@@ -1,3 +1,0 @@
-/home/vniksihov/src/cpp/fs_watcher/build/CMakeFiles/rebuild_cache.dir
-/home/vniksihov/src/cpp/fs_watcher/build/CMakeFiles/fs_watcher.dir
-/home/vniksihov/src/cpp/fs_watcher/build/CMakeFiles/edit_cache.dir
