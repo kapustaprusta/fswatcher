@@ -12,13 +12,33 @@
 namespace file_system
 {
 
+struct FSWatcherEvent
+{
+	FSWatcherEvent();
+	~FSWatcherEvent();
+
+	enum Type
+	{
+		UNKNOWN      = 0,
+		WAS_CREATED  = 1,
+		WAS_DELETED  = 2,
+		WAS_MODIFIED = 3,
+	};
+
+	/** */
+	Type type_;
+
+	/** */
+	std::string name_;
+};
+
 class IFSWatcherEventSub
 {
 public:
 	IFSWatcherEventSub() = default;
 	virtual ~IFSWatcherEventSub() = default;
 
-	virtual void AddEvent() = 0;
+	virtual void AddEvent(const FSWatcherEvent &crEvent) = 0;
 };
 
 class FSWatcher
