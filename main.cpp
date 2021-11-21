@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "fs_watcher.h"
+#include "src/fs_watcher.h"
 
 int main()
 {
