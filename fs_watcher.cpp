@@ -12,9 +12,16 @@ FSWatcherEvent::FSWatcherEvent()
 
 }
 
+FSWatcherEvent::FSWatcherEvent(FSWatcherEvent &&FSEvent)
+{
+	isDir_ = std::move(FSEvent.isDir_);
+	type_  = std::move(FSEvent.type_ );
+	name_  = std::move(FSEvent.name_ );
+}
+
 FSWatcherEvent::FSWatcherEvent(const std::string &name,
-							   const eType &type,
-							   bool isDir)
+							   bool isDir,
+							   const eType &type)
 	: isDir_(isDir)
 	, type_(type)
 	, name_(name)
@@ -208,45 +215,35 @@ void FSWatcher::WaitForEvents()
 						= (inotify_event *) &eventsBuffer_[eventsIdx];
 			if (event->len != 0)
 			{
-				if (event->mask & IN_MODIFY) 
+				FSWatcherEvent FSEvent(event->name,
+									   event->mask & IN_ISDIR);
+
+				if (event->mask & IN_MODIFY)
 				{
-					if (event->mask & IN_ISDIR)
-					{
-						printf("The directory %s was modified.\n", event->name);
-					}
-					else
-					{
-						printf("The file %s was modified.\n", event->name);
-					}
+					FSEvent.SetType(FSWatcherEvent::WAS_MODIFIED);
+				}
+				else if (event->mask & IN_CREATE) 
+				{
+					FSEvent.SetType(FSWatcherEvent::WAS_CREATED);
+				}
+				else if (event->mask & IN_DELETE) 
+				{
+					FSEvent.SetType(FSWatcherEvent::WAS_DELETED);
 				}
 
-				if (event->mask & IN_CREATE) 
-				{
-					if (event->mask & IN_ISDIR)
-					{
-						printf("The directory %s was created.\n", event->name);
-					}
-					else
-					{
-						printf("The file %s was created.\n", event->name);
-					}
-				}
-
-				if (event->mask & IN_DELETE) 
-				{
-					if (event->mask & IN_ISDIR)
-					{
-						printf("The directory %s was deleted.\n", event->name);
-					}
-					else
-					{
-						printf("The file %s was deleted.\n", event->name);
-					}
-				}
+				NotifySubs(std::move(FSEvent));
 
 				eventsIdx += eventSize_ + event->len;
 			}
 		}
+	}
+}
+
+void FSWatcher::NotifySubs(FSWatcherEvent FSEvent)
+{
+	for (const auto &sub : lEventsSubs_)
+	{
+		sub->AddEvent(FSEvent);
 	}
 }
 

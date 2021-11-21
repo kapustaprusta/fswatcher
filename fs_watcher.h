@@ -24,9 +24,10 @@ public:
 	};
 
 	FSWatcherEvent();
+	FSWatcherEvent(FSWatcherEvent &&FSEvent);
 	FSWatcherEvent(const std::string &name,
-				   const eType &type,
-				   bool isDir = false);
+				   bool isDir = false,
+				   const eType &type = UNKNOWN);
 	~FSWatcherEvent();
 
 	void SetType(const eType &type);
@@ -79,6 +80,8 @@ public:
 private:
 	bool CloseDescr();
 	void WaitForEvents();
+
+	void NotifySubs(FSWatcherEvent FSEvent);
 
 	/** */
 	uint32_t notifyDescr_;
