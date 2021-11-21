@@ -1,5 +1,7 @@
 #include <map>
 #include <list>
+#include <mutex>
+#include <memory>
 #include <atomic>
 #include <thread>
 #include <string>
@@ -31,8 +33,8 @@ public:
 	bool AddNode(const std::string &crstrNode);
 	bool RemoveNode(const std::string &crstrNode);
 
-	void AddEventSub(IFSWatcherEventSub *pEventSub);
-	void RemoveEventSub(IFSWatcherEventSub *pEventSub);
+	void AddEventSub(std::shared_ptr<IFSWatcherEventSub> &rEventSub);
+	void RemoveEventSub(const std::shared_ptr<IFSWatcherEventSub> &crEventSub);
 
 private:
 	bool CloseDescr();
@@ -48,19 +50,22 @@ private:
 	const uint32_t eventsBufferSize_;
 
 	/** */
-	std::thread workingThread_;
+	std::atomic_bool isStop_;
 
 	/** */
-	std::atomic_bool isStop_;
+	std::mutex membersMutex_;
+
+	/** */
+	std::thread workingThread_;
 
 	/** */
 	std::vector<uint8_t> eventsBuffer_;
 
 	/** */
-	std::list<IFSWatcherEventSub*> lEventsSubs_;
+	std::map<std::string, uint32_t> watchDescrs_;
 
 	/** */
-	std::map<std::string, uint32_t> watchDescrs_;
+	std::list<std::shared_ptr<IFSWatcherEventSub>> lEventsSubs_;
 };
 
 }

@@ -51,14 +51,20 @@ bool FSWatcher::AddNode(const std::string &crstrNode)
 		return false;
 	}
 
-	watchDescrs_.insert(std::make_pair(crstrNode,
-									   watchDescr));
+	{
+		std::lock_guard<std::mutex> lock(membersMutex_);
+
+		watchDescrs_.insert(std::make_pair(crstrNode,
+										   watchDescr));
+	}
 
 	return true;
 }
 
 bool FSWatcher::RemoveNode(const std::string &crstrNode)
 {
+	std::lock_guard<std::mutex> lock(membersMutex_);
+	
 	std::map<std::string, uint32_t>::iterator itDeletedNode
 												= watchDescrs_.find(crstrNode);
 	if (itDeletedNode == watchDescrs_.end())
@@ -78,14 +84,18 @@ bool FSWatcher::RemoveNode(const std::string &crstrNode)
 	return true;
 }
 
-void FSWatcher::AddEventSub(IFSWatcherEventSub *pEventSub)
+void FSWatcher::AddEventSub(std::shared_ptr<IFSWatcherEventSub> &rEventSub)
 {
-	lEventsSubs_.push_back(pEventSub);
+	std::lock_guard<std::mutex> lock(membersMutex_);
+
+	lEventsSubs_.push_back(rEventSub);
 }
 
-void FSWatcher::RemoveEventSub(IFSWatcherEventSub *pEventSub)
+void FSWatcher::RemoveEventSub(const std::shared_ptr<IFSWatcherEventSub> &crEventSub)
 {
-	lEventsSubs_.remove(pEventSub);
+	std::lock_guard<std::mutex> lock(membersMutex_);
+
+	lEventsSubs_.remove(crEventSub);
 }
 
 bool FSWatcher::CloseDescr()
