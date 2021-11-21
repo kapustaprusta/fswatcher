@@ -7,6 +7,62 @@
 namespace file_system
 {
 
+FSWatcherEvent::FSWatcherEvent()
+{
+
+}
+
+FSWatcherEvent::FSWatcherEvent(const std::string &name,
+							   const eType &type,
+							   bool isDir)
+	: isDir_(isDir)
+	, type_(type)
+	, name_(name)
+{
+
+}
+
+FSWatcherEvent::~FSWatcherEvent()
+{
+
+}
+
+void FSWatcherEvent::SetType(const eType &type)
+{
+	std::lock_guard<std::mutex> lock(membersMutex_);
+
+	type_ = type;
+}
+
+FSWatcherEvent::eType FSWatcherEvent::Type() const
+{
+	return type_;
+}
+
+void FSWatcherEvent::SetIsDir(bool isDir)
+{
+	std::lock_guard<std::mutex> lock(membersMutex_);
+
+	isDir_ = isDir;
+}
+
+bool FSWatcherEvent::IsDir() const
+{
+	return isDir_;
+}
+
+void FSWatcherEvent::SetName(const std::string &name)
+{
+	std::lock_guard<std::mutex> lock(membersMutex_);
+
+	name_ = name;
+}
+
+std::string FSWatcherEvent::Name() const
+{
+	return name_;
+}
+
 FSWatcher::FSWatcher()
 	: isStop_(false)
 	, eventSize_(sizeof(inotify_event))

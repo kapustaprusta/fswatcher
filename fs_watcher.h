@@ -12,12 +12,10 @@
 namespace file_system
 {
 
-struct FSWatcherEvent
+class FSWatcherEvent
 {
-	FSWatcherEvent();
-	~FSWatcherEvent();
-
-	enum Type
+public:
+	enum eType
 	{
 		UNKNOWN      = 0,
 		WAS_CREATED  = 1,
@@ -25,11 +23,33 @@ struct FSWatcherEvent
 		WAS_MODIFIED = 3,
 	};
 
+	FSWatcherEvent();
+	FSWatcherEvent(const std::string &name,
+				   const eType &type,
+				   bool isDir = false);
+	~FSWatcherEvent();
+
+	void SetType(const eType &type);
+	eType Type() const;
+
+	void SetIsDir(bool isDir);
+	bool IsDir() const;
+
+	void SetName(const std::string &name);
+	std::string Name() const;
+
+private:
 	/** */
-	Type type_;
+	bool isDir_;
+
+	/** */
+	eType type_;
 
 	/** */
 	std::string name_;
+
+	/** */
+	std::mutex membersMutex_;
 };
 
 class IFSWatcherEventSub
