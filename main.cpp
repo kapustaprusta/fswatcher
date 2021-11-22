@@ -1,10 +1,10 @@
 #include <iostream>
 
-#include "src/fs_watcher.h"
+#include "src/filesystem/watcher.h"
 
 int main()
 {
-	file_system::FSWatcher watcher;
+	filesystem::Watcher watcher;
 	watcher.AddNode("/home/vniksihov/Test");
 	watcher.Start();
 
