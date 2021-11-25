@@ -1,6 +1,6 @@
 #pragma once
 
-#include "event.h"
+class Event;
 
 namespace filesystem
 {

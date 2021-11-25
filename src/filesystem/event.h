@@ -18,7 +18,7 @@ public:
 	};
 
 	Event();
-	Event(Event &&FSEvent);
+	Event(Event &&event);
 	Event(const std::string &name,
 		  bool isDir = false,
 		  const eType &type = UNKNOWN);
