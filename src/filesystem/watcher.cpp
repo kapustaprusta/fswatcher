@@ -9,7 +9,7 @@ namespace filesystem
 {
 
 Watcher::Watcher()
-	: isStop_(false)
+	: isRunning_(false)
 	, eventSize_(sizeof(inotify_event))
 	, eventsBufferSize_(1024*(eventSize_+16))
 {
@@ -28,17 +28,24 @@ Watcher::~Watcher()
 
 void Watcher::Start()
 {
-	std::lock_guard<std::mutex> lock(membersMutex_);
+	if (isRunning_.load())
+	{
+		return;
+	}
 
 	workingThread_
 			= std::thread(&Watcher::WaitForEvents, this);
+	isRunning_.store(true);
 }
 
 void Watcher::Stop()
 {
-	std::lock_guard<std::mutex> lock(membersMutex_);
+	if (!isRunning_.load())
+	{
+		return;
+	}
 
-	isStop_ = true;
+	isRunning_.store(false);
 	if (workingThread_.joinable())
 	{
 		workingThread_.join();
@@ -121,7 +128,7 @@ void Watcher::WaitForEvents()
 	uint64_t eventsIdx = 0;
 	eventsBuffer_.resize(eventsBufferSize_);
 
-	while(!isStop_)
+	while(isRunning_.load())
 	{
 		eventsIdx = 0;
 		eventsBuffer_.clear();
@@ -149,6 +156,7 @@ void Watcher::WaitForEvents()
 			continue;
 		}
 
+		std::list<Event> lEvents;
 		while (eventsIdx < eventsLength)
 		{
 			inotify_event *iEvent
@@ -171,19 +179,24 @@ void Watcher::WaitForEvents()
 					event.SetType(Event::WAS_DELETED);
 				}
 
-				NotifySubs(std::move(event));
+				lEvents.push_back(std::move(event));
 
 				eventsIdx += eventSize_ + iEvent->len;
 			}
 		}
+
+		NotifySubs(std::move(lEvents));
 	}
 }
 
-void Watcher::NotifySubs(Event event)
+void Watcher::NotifySubs(std::list<Event> events)
 {
-	for (const auto &sub : lEventsSubs_)
+	for (const auto &crEvent : events)
 	{
-		sub->AddEvent(event);
+		for (const auto &crEventsSub : lEventsSubs_)
+		{
+			crEventsSub->AddEvent(crEvent);
+		}
 	}
 }
 

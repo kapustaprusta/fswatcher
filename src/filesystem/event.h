@@ -1,6 +1,6 @@
-#include <mutex>
 #pragma once
 
+#include <mutex>
 #include <string>
 
 namespace filesystem

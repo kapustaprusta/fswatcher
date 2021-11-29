@@ -4,6 +4,8 @@ namespace filesystem
 {
 
 Event::Event()
+	: isDir_(false)
+	, type_(UNKNOWN)
 {
 
 }

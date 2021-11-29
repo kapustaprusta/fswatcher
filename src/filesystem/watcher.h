@@ -3,6 +3,7 @@
 #include <map>
 #include <list>
 #include <mutex>
+#include <atomic>
 #include <memory>
 #include <thread>
 #include <string>
@@ -35,10 +36,10 @@ private:
 	bool CloseDescr();
 	void WaitForEvents();
 
-	void NotifySubs(Event event);
+	void NotifySubs(std::list<Event> events);
 
 	/** */
-	bool isStop_;
+	std::atomic_bool isRunning_;
 
 	/** */
 	uint32_t notifyDescr_;
