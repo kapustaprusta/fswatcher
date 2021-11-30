@@ -1,4 +1,4 @@
-project(fs_watcher)
+project(fswatcher)
 
 cmake_minimum_required(VERSION 3.21)
 
@@ -10,7 +10,7 @@ set(SOURCES main.cpp
             src/filesystem/event.cpp
             src/filesystem/watcher.cpp)
 
-add_executable(fs_watcher ${HEADERS}
-                          ${SOURCES})
+add_executable(fswatcher ${HEADERS}
+                        ${SOURCES})
 
-target_link_libraries(fs_watcher pthread)
+target_link_libraries(fswatcher pthread)

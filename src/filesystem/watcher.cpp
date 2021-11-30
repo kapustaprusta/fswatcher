@@ -126,11 +126,13 @@ void Watcher::WaitForEvents()
 	time_to_wait.tv_usec = 0;
 
 	uint64_t eventsIdx = 0;
+	std::list<Event> lEvents;
 	eventsBuffer_.resize(eventsBufferSize_);
 
 	while(isRunning_.load())
 	{
 		eventsIdx = 0;
+		lEvents.clear();
 		eventsBuffer_.clear();
 
 		FD_ZERO(              &descriptors);
@@ -156,7 +158,6 @@ void Watcher::WaitForEvents()
 			continue;
 		}
 
-		std::list<Event> lEvents;
 		while (eventsIdx < eventsLength)
 		{
 			inotify_event *iEvent
@@ -191,12 +192,9 @@ void Watcher::WaitForEvents()
 
 void Watcher::NotifySubs(std::list<Event> events)
 {
-	for (const auto &crEvent : events)
+	for (const auto &crEventsSub : lEventsSubs_)
 	{
-		for (const auto &crEventsSub : lEventsSubs_)
-		{
-			crEventsSub->AddEvent(crEvent);
-		}
+		crEventsSub->AddEvents(events);
 	}
 }
 
