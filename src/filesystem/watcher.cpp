@@ -132,7 +132,6 @@ void Watcher::WaitForEvents()
 	while(isRunning_.load())
 	{
 		eventsIdx = 0;
-		lEvents.clear();
 		eventsBuffer_.clear();
 
 		FD_ZERO(              &descriptors);
