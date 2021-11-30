@@ -10,9 +10,17 @@ public:
 	MySub() = default;
 	~MySub() = default;
 
-	void AddEvent(const filesystem::Event &crEvent) override
+	void AddEvent(const filesystem::Event &event) override
 	{
-		std::cout << "EVENT NAME: " << crEvent.Name() << "\n";
+		std::cout << "EVENT NAME: " << event.Name() << "\n";
+	}
+
+	void AddEvents(const std::list<filesystem::Event> &events) override
+	{
+		for (const auto &event : events)
+		{
+			std::cout << "EVENT NAME: " << event.Name() << "\n";
+		}
 	}
 };
 
